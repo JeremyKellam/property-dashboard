@@ -24,7 +24,7 @@ export default function ExpensesTab() {
 
   const load = () => getExpenses({ year }).then((r) => setExpenses(r.data));
 
-  useEffect(() => { load(); }, [year]);
+  useEffect(() => { load(); }, [year]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const handleSubmit = async (e) => {
     e.preventDefault();

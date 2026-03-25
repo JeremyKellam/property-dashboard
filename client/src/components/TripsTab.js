@@ -17,7 +17,7 @@ export default function TripsTab() {
     getTripSummary({ year }).then((r) => setSummary(r.data));
   };
 
-  useEffect(() => { load(); }, [year]);
+  useEffect(() => { load(); }, [year]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const handleSubmit = async (e) => {
     e.preventDefault();

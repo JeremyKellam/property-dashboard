@@ -17,7 +17,7 @@ export default function RentTab() {
 
   const load = () => getRent({ year, month }).then((r) => setRecords(r.data));
 
-  useEffect(() => { load(); }, [year, month]);
+  useEffect(() => { load(); }, [year, month]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const handleSetup = async (e) => {
     e.preventDefault();
