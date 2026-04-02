@@ -37,3 +37,14 @@ export const addTrip = (data) => API.post('/trips', data);
 export const deleteTrip = (id) => API.delete(`/trips/${id}`);
 
 export const getMonthlySummary = (params) => API.get('/summary/monthly', { params });
+
+export const exportToExcel = async (year) => {
+  const params = year ? { year } : {};
+  const res = await API.get('/export', { params, responseType: 'blob' });
+  const url = URL.createObjectURL(res.data);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = year ? `property-dashboard-${year}.xlsx` : 'property-dashboard.xlsx';
+  a.click();
+  URL.revokeObjectURL(url);
+};

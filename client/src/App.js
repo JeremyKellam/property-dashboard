@@ -3,6 +3,7 @@ import RentTab from './components/RentTab';
 import ExpensesTab from './components/ExpensesTab';
 import TripsTab from './components/TripsTab';
 import SummaryTab from './components/SummaryTab';
+import { exportToExcel } from './api';
 import './App.css';
 
 const TABS = ['Summary', 'Rent', 'Expenses', 'Trips'];
@@ -51,6 +52,9 @@ function App() {
               {tab}
             </button>
           ))}
+          <button onClick={() => exportToExcel(new Date().getFullYear())}>
+            Export {new Date().getFullYear()}
+          </button>
         </nav>
       </header>
       <main>
