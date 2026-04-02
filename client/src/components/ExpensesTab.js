@@ -2,11 +2,14 @@ import React, { useEffect, useState } from 'react';
 import { getExpenses, addExpense, deleteExpense } from '../api';
 
 const CATEGORIES = {
-  mortgage: 'Mortgage',
+  mortgage: 'Mortgage Interest',
   insurance_homeowner: 'Insurance (Homeowner)',
   insurance_flood: 'Insurance (Flood)',
-  water_sewer: 'Water & Sewer',
-  maintenance: 'Maintenance',
+  taxes: 'Property Taxes',
+  water_sewer: 'Utilities',
+  maintenance: 'Repairs & Maintenance',
+  supplies: 'Supplies',
+  professional_fees: 'Legal & Professional Fees',
 };
 
 const fmt = (n) => `$${parseFloat(n || 0).toLocaleString('en-US', { minimumFractionDigits: 2 })}`;
