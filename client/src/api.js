@@ -4,6 +4,23 @@ const API = axios.create({
   baseURL: process.env.REACT_APP_API_URL || 'http://localhost:4000/api',
 });
 
+API.interceptors.request.use((config) => {
+  const key = localStorage.getItem('apiKey');
+  if (key) config.headers['Authorization'] = `Bearer ${key}`;
+  return config;
+});
+
+API.interceptors.response.use(
+  (res) => res,
+  (err) => {
+    if (err.response?.status === 401) {
+      localStorage.removeItem('apiKey');
+      window.location.reload();
+    }
+    return Promise.reject(err);
+  }
+);
+
 export const getRent = (params) => API.get('/rent', { params });
 export const createRent = (data) => API.post('/rent', data);
 export const payRent = (id, data) => API.post(`/rent/${id}/pay`, data);
