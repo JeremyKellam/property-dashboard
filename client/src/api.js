@@ -26,6 +26,7 @@ export const createRent = (data) => API.post('/rent', data);
 export const payRent = (id, data) => API.post(`/rent/${id}/pay`, data);
 export const applyLateFee = (id) => API.post(`/rent/${id}/late-fee`);
 export const getPayments = (id) => API.get(`/rent/${id}/payments`);
+export const deleteRent = (id) => API.delete(`/rent/${id}`);
 
 export const getExpenses = (params) => API.get('/expenses', { params });
 export const addExpense = (data) => API.post('/expenses', data);

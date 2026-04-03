@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { getRent, createRent, payRent, applyLateFee, getPayments } from '../api';
+import { getRent, createRent, payRent, applyLateFee, getPayments, deleteRent } from '../api';
 
 const MONTHS = ['January','February','March','April','May','June',
   'July','August','September','October','November','December'];
@@ -35,6 +35,12 @@ export default function RentTab() {
 
   const handleLateFee = async (id) => {
     await applyLateFee(id);
+    load();
+  };
+
+  const handleDelete = async (id) => {
+    if (!window.confirm('Delete this rent record and all its payments?')) return;
+    await deleteRent(id);
     load();
   };
 
@@ -120,6 +126,7 @@ export default function RentTab() {
                         <button className="small" onClick={() => loadPayments(r.id)}>
                           {payments[r.id] ? 'Hide' : 'History'}
                         </button>
+                        <button className="danger" onClick={() => handleDelete(r.id)}>Delete</button>
                       </td>
                     </tr>
                     {payments[r.id] && (

@@ -74,6 +74,14 @@ router.post('/:id/pay', async (req, res) => {
   res.json(updated.rows[0]);
 });
 
+// Delete a rent record and its payments
+router.delete('/:id', async (req, res) => {
+  const id = req.params.id;
+  await pool.query('DELETE FROM payments WHERE rent_payment_id = $1', [id]);
+  await pool.query('DELETE FROM rent_payments WHERE id = $1', [id]);
+  res.json({ success: true });
+});
+
 // Apply late fee to a rent record
 router.post('/:id/late-fee', async (req, res) => {
   const result = await pool.query(
