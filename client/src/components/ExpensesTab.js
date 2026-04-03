@@ -10,6 +10,7 @@ const CATEGORIES = {
   maintenance: 'Repairs & Maintenance',
   supplies: 'Supplies',
   professional_fees: 'Legal & Professional Fees',
+  depreciation: 'Depreciation',
 };
 
 const fmt = (n) => `$${parseFloat(n || 0).toLocaleString('en-US', { minimumFractionDigits: 2 })}`;
