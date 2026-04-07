@@ -107,7 +107,7 @@ export default function TripsTab() {
             <tbody>
               {trips.map((t) => (
                 <tr key={t.id}>
-                  <td>{t.trip_date}</td>
+                  <td>{new Date(t.trip_date).toLocaleDateString('en-US', { month: 'short', year: 'numeric', timeZone: 'UTC' })}</td>
                   <td>{parseFloat(t.miles).toFixed(1)}</td>
                   <td>{fmt(parseFloat(t.miles) * IRS_RATE)}</td>
                   <td>{t.purpose || '—'}</td>
