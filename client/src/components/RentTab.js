@@ -146,7 +146,7 @@ export default function RentTab() {
                               <tbody>
                                 {payments[r.id].map((p) => (
                                   <tr key={p.id}>
-                                    <td>{p.payment_date}</td>
+                                    <td>{new Date(p.payment_date).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric', timeZone: 'UTC' })}</td>
                                     <td>{fmt(p.amount)}</td>
                                     <td>{p.notes || '—'}</td>
                                   </tr>

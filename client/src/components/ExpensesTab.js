@@ -122,7 +122,7 @@ export default function ExpensesTab() {
             <tbody>
               {expenses.map((e) => (
                 <tr key={e.id}>
-                  <td>{new Date(e.expense_date).toLocaleDateString('en-US', { month: 'short', year: 'numeric', timeZone: 'UTC' })}</td>
+                  <td>{new Date(e.expense_date).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric', timeZone: 'UTC' })}</td>
                   <td>{CATEGORIES[e.category]}</td>
                   <td>{fmt(e.amount)}</td>
                   <td>{e.description || '—'}</td>
