@@ -9,22 +9,21 @@ const fmt = (n) => `$${parseFloat(n || 0).toLocaleString('en-US', { minimumFract
 export default function RentTab() {
   const now = new Date();
   const [year, setYear] = useState(now.getFullYear());
-  const [month, setMonth] = useState(now.getMonth() + 1);
   const [records, setRecords] = useState([]);
-  const [setupForm, setSetupForm] = useState({ unit_number: 1, amount_due: '' });
+  const [setupForm, setSetupForm] = useState({ unit_number: 1, amount_due: '', month: now.getMonth() + 1 });
   const [payForm, setPayForm] = useState({ id: null, amount: '', payment_date: '', notes: '' });
   const [editForm, setEditForm] = useState(null);
   const [payments, setPayments] = useState({});
 
-  const load = () => getRent({ year, month }).then((r) => setRecords(r.data));
+  const load = () => getRent({ year }).then((r) => setRecords(r.data));
 
-  useEffect(() => { load(); }, [year, month]); // eslint-disable-line react-hooks/exhaustive-deps
+  useEffect(() => { load(); }, [year]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const handleSetup = async (e) => {
     e.preventDefault();
-    await createRent({ ...setupForm, year, month });
+    await createRent({ ...setupForm, year });
     load();
-    setSetupForm({ unit_number: 1, amount_due: '' });
+    setSetupForm({ unit_number: 1, amount_due: '', month: now.getMonth() + 1 });
   };
 
   const handlePay = async (e) => {
@@ -67,10 +66,6 @@ export default function RentTab() {
   return (
     <div>
       <div className="year-selector">
-        <label>Month</label>
-        <select value={month} onChange={(e) => setMonth(parseInt(e.target.value))}>
-          {MONTHS.map((m, i) => <option key={i+1} value={i+1}>{m}</option>)}
-        </select>
         <label>Year</label>
         <select value={year} onChange={(e) => setYear(parseInt(e.target.value))}>
           {years.map((y) => <option key={y} value={y}>{y}</option>)}
@@ -80,6 +75,11 @@ export default function RentTab() {
       <div className="card">
         <h2>Set Rent Due</h2>
         <form onSubmit={handleSetup}>
+          <label>Month
+            <select value={setupForm.month} onChange={(e) => setSetupForm({ ...setupForm, month: parseInt(e.target.value) })}>
+              {MONTHS.map((m, i) => <option key={i+1} value={i+1}>{m}</option>)}
+            </select>
+          </label>
           <label>Unit
             <select value={setupForm.unit_number} onChange={(e) => setSetupForm({ ...setupForm, unit_number: parseInt(e.target.value) })}>
               {[1,2,3,4].map((u) => <option key={u} value={u}>Unit {u}</option>)}
@@ -95,13 +95,14 @@ export default function RentTab() {
       </div>
 
       <div className="card">
-        <h2>Rent Status — {MONTHS[month-1]} {year}</h2>
+        <h2>Rent Status — {year}</h2>
         {records.length === 0 ? (
-          <p style={{ color: '#999', fontSize: 14 }}>No rent records for this month. Set rent due above.</p>
+          <p style={{ color: '#999', fontSize: 14 }}>No rent records for this year.</p>
         ) : (
           <table>
             <thead>
               <tr>
+                <th>Month</th>
                 <th>Unit</th>
                 <th>Due</th>
                 <th>Late Fee</th>
@@ -118,6 +119,7 @@ export default function RentTab() {
                 return (
                   <React.Fragment key={r.id}>
                     <tr>
+                      <td>{MONTHS[r.month - 1]}</td>
                       <td>Unit {r.unit_number}</td>
                       <td>{fmt(r.amount_due)}</td>
                       <td>{parseFloat(r.late_fee) > 0 ? fmt(r.late_fee) : '—'}</td>
@@ -140,7 +142,7 @@ export default function RentTab() {
                     </tr>
                     {payments[r.id] && (
                       <tr>
-                        <td colSpan={7} style={{ background: '#fafafa', padding: '8px 24px' }}>
+                        <td colSpan={8} style={{ background: '#fafafa', padding: '8px 24px' }}>
                           {payments[r.id].length === 0 ? (
                             <span style={{ color: '#999', fontSize: 13 }}>No payments recorded.</span>
                           ) : (
