@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { getRent, createRent, payRent, applyLateFee, getPayments, deleteRent } from '../api';
+import { getRent, createRent, payRent, applyLateFee, getPayments, deleteRent, updateRent } from '../api';
 
 const MONTHS = ['January','February','March','April','May','June',
   'July','August','September','October','November','December'];
@@ -13,6 +13,7 @@ export default function RentTab() {
   const [records, setRecords] = useState([]);
   const [setupForm, setSetupForm] = useState({ unit_number: 1, amount_due: '' });
   const [payForm, setPayForm] = useState({ id: null, amount: '', payment_date: '', notes: '' });
+  const [editForm, setEditForm] = useState(null);
   const [payments, setPayments] = useState({});
 
   const load = () => getRent({ year, month }).then((r) => setRecords(r.data));
@@ -36,6 +37,13 @@ export default function RentTab() {
   const handleLateFee = async (id) => {
     await applyLateFee(id);
     load();
+  };
+
+  const handleEditRent = async (e) => {
+    e.preventDefault();
+    await updateRent(editForm.id, { amount_due: editForm.amount_due });
+    load();
+    setEditForm(null);
   };
 
   const handleDelete = async (id) => {
@@ -126,6 +134,7 @@ export default function RentTab() {
                         <button className="small" onClick={() => loadPayments(r.id)}>
                           {payments[r.id] ? 'Hide' : 'History'}
                         </button>
+                        <button className="small" onClick={() => setEditForm({ id: r.id, unit_number: r.unit_number, amount_due: r.amount_due })}>Edit</button>
                         <button className="danger" onClick={() => handleDelete(r.id)}>Delete</button>
                       </td>
                     </tr>
@@ -164,6 +173,21 @@ export default function RentTab() {
           </table>
         )}
       </div>
+
+      {editForm && (
+        <div className="card">
+          <h2>Edit Rent — Unit {editForm.unit_number}</h2>
+          <form onSubmit={handleEditRent}>
+            <label>Amount Due
+              <input type="number" step="0.01" value={editForm.amount_due}
+                onChange={(e) => setEditForm({ ...editForm, amount_due: e.target.value })}
+                required />
+            </label>
+            <button type="submit" className="primary">Save</button>
+            <button type="button" className="danger" onClick={() => setEditForm(null)}>Cancel</button>
+          </form>
+        </div>
+      )}
 
       {payForm.id && (
         <div className="card">

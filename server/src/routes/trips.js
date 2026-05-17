@@ -45,6 +45,16 @@ router.post('/', async (req, res) => {
   res.json(result.rows[0]);
 });
 
+// Update a trip
+router.put('/:id', async (req, res) => {
+  const { trip_date, miles, purpose } = req.body;
+  const result = await pool.query(
+    'UPDATE trips SET trip_date=$1, miles=$2, purpose=$3 WHERE id=$4 RETURNING *',
+    [trip_date, miles, purpose, req.params.id]
+  );
+  res.json(result.rows[0]);
+});
+
 // Delete a trip
 router.delete('/:id', async (req, res) => {
   await pool.query('DELETE FROM trips WHERE id = $1', [req.params.id]);

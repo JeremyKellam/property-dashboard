@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { getTrips, getTripSummary, addTrip, deleteTrip } from '../api';
+import { getTrips, getTripSummary, addTrip, updateTrip, deleteTrip } from '../api';
 
 const IRS_RATE = 0.70; // 2024 IRS mileage rate
 
@@ -11,6 +11,7 @@ export default function TripsTab() {
   const [trips, setTrips] = useState([]);
   const [summary, setSummary] = useState([]);
   const [form, setForm] = useState({ trip_date: '', miles: '', purpose: '' });
+  const [editForm, setEditForm] = useState(null);
 
   const load = () => {
     getTrips({ year }).then((r) => setTrips(r.data));
@@ -24,6 +25,13 @@ export default function TripsTab() {
     await addTrip(form);
     load();
     setForm({ trip_date: '', miles: '', purpose: '' });
+  };
+
+  const handleEdit = async (e) => {
+    e.preventDefault();
+    await updateTrip(editForm.id, { trip_date: editForm.trip_date, miles: editForm.miles, purpose: editForm.purpose });
+    load();
+    setEditForm(null);
   };
 
   const handleDelete = async (id) => {
@@ -111,13 +119,39 @@ export default function TripsTab() {
                   <td>{parseFloat(t.miles).toFixed(1)}</td>
                   <td>{fmt(parseFloat(t.miles) * IRS_RATE)}</td>
                   <td>{t.purpose || '—'}</td>
-                  <td><button className="danger" onClick={() => handleDelete(t.id)}>Delete</button></td>
+                  <td style={{ display: 'flex', gap: 6 }}>
+                    <button className="small" onClick={() => setEditForm({ id: t.id, trip_date: t.trip_date.slice(0, 10), miles: t.miles, purpose: t.purpose || '' })}>Edit</button>
+                    <button className="danger" onClick={() => handleDelete(t.id)}>Delete</button>
+                  </td>
                 </tr>
               ))}
             </tbody>
           </table>
         )}
       </div>
+      {editForm && (
+        <div className="card">
+          <h2>Edit Trip</h2>
+          <form onSubmit={handleEdit}>
+            <label>Date
+              <input type="date" value={editForm.trip_date}
+                onChange={(e) => setEditForm({ ...editForm, trip_date: e.target.value })}
+                required />
+            </label>
+            <label>Miles
+              <input type="number" step="0.1" value={editForm.miles}
+                onChange={(e) => setEditForm({ ...editForm, miles: e.target.value })}
+                required />
+            </label>
+            <label>Purpose
+              <input type="text" value={editForm.purpose}
+                onChange={(e) => setEditForm({ ...editForm, purpose: e.target.value })} />
+            </label>
+            <button type="submit" className="primary">Save</button>
+            <button type="button" className="danger" onClick={() => setEditForm(null)}>Cancel</button>
+          </form>
+        </div>
+      )}
     </div>
   );
 }

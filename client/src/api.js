@@ -30,12 +30,16 @@ export const deleteRent = (id) => API.delete(`/rent/${id}`);
 
 export const getExpenses = (params) => API.get('/expenses', { params });
 export const addExpense = (data) => API.post('/expenses', data);
+export const updateExpense = (id, data) => API.put(`/expenses/${id}`, data);
 export const deleteExpense = (id) => API.delete(`/expenses/${id}`);
 
 export const getTrips = (params) => API.get('/trips', { params });
 export const getTripSummary = (params) => API.get('/trips/summary', { params });
 export const addTrip = (data) => API.post('/trips', data);
+export const updateTrip = (id, data) => API.put(`/trips/${id}`, data);
 export const deleteTrip = (id) => API.delete(`/trips/${id}`);
+
+export const updateRent = (id, data) => API.put(`/rent/${id}`, data);
 
 export const getMonthlySummary = (params) => API.get('/summary/monthly', { params });
 

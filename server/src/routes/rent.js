@@ -74,6 +74,16 @@ router.post('/:id/pay', async (req, res) => {
   res.json(updated.rows[0]);
 });
 
+// Update amount due on a rent record
+router.put('/:id', async (req, res) => {
+  const { amount_due } = req.body;
+  const result = await pool.query(
+    'UPDATE rent_payments SET amount_due=$1, updated_at=NOW() WHERE id=$2 RETURNING *',
+    [amount_due, req.params.id]
+  );
+  res.json(result.rows[0]);
+});
+
 // Delete a rent record and its payments
 router.delete('/:id', async (req, res) => {
   const id = req.params.id;

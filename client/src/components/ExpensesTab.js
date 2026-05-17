@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { getExpenses, addExpense, deleteExpense } from '../api';
+import { getExpenses, addExpense, updateExpense, deleteExpense } from '../api';
 
 const CATEGORIES = {
   mortgage: 'Mortgage Interest',
@@ -25,6 +25,7 @@ export default function ExpensesTab() {
     description: '',
     expense_date: '',
   });
+  const [editForm, setEditForm] = useState(null);
 
   const load = () => getExpenses({ year }).then((r) => setExpenses(r.data));
 
@@ -32,14 +33,26 @@ export default function ExpensesTab() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    const date = new Date(form.expense_date);
+    const [y, m] = form.expense_date.split('-').map(Number);
     await addExpense({
       ...form,
-      year: date.getFullYear(),
-      month: date.getMonth() + 1,
+      year: y,
+      month: m,
     });
     load();
     setForm({ category: 'mortgage', amount: '', description: '', expense_date: '' });
+  };
+
+  const handleEdit = async (e) => {
+    e.preventDefault();
+    await updateExpense(editForm.id, {
+      category: editForm.category,
+      amount: editForm.amount,
+      description: editForm.description,
+      expense_date: editForm.expense_date,
+    });
+    load();
+    setEditForm(null);
   };
 
   const handleDelete = async (id) => {
@@ -126,13 +139,44 @@ export default function ExpensesTab() {
                   <td>{CATEGORIES[e.category]}</td>
                   <td>{fmt(e.amount)}</td>
                   <td>{e.description || '—'}</td>
-                  <td><button className="danger" onClick={() => handleDelete(e.id)}>Delete</button></td>
+                  <td style={{ display: 'flex', gap: 6 }}>
+                    <button className="small" onClick={() => setEditForm({ id: e.id, category: e.category, amount: e.amount, description: e.description || '', expense_date: e.expense_date.slice(0, 10) })}>Edit</button>
+                    <button className="danger" onClick={() => handleDelete(e.id)}>Delete</button>
+                  </td>
                 </tr>
               ))}
             </tbody>
           </table>
         )}
       </div>
+      {editForm && (
+        <div className="card">
+          <h2>Edit Expense</h2>
+          <form onSubmit={handleEdit}>
+            <label>Category
+              <select value={editForm.category} onChange={(e) => setEditForm({ ...editForm, category: e.target.value })}>
+                {Object.entries(CATEGORIES).map(([k, v]) => <option key={k} value={k}>{v}</option>)}
+              </select>
+            </label>
+            <label>Amount
+              <input type="number" step="0.01" value={editForm.amount}
+                onChange={(e) => setEditForm({ ...editForm, amount: e.target.value })}
+                required />
+            </label>
+            <label>Date
+              <input type="date" value={editForm.expense_date}
+                onChange={(e) => setEditForm({ ...editForm, expense_date: e.target.value })}
+                required />
+            </label>
+            <label>Description
+              <input type="text" value={editForm.description}
+                onChange={(e) => setEditForm({ ...editForm, description: e.target.value })} />
+            </label>
+            <button type="submit" className="primary">Save</button>
+            <button type="button" className="danger" onClick={() => setEditForm(null)}>Cancel</button>
+          </form>
+        </div>
+      )}
     </div>
   );
 }
