@@ -134,49 +134,52 @@ export default function ExpensesTab() {
             </thead>
             <tbody>
               {expenses.map((e) => (
-                <tr key={e.id}>
-                  <td>{new Date(e.expense_date).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric', timeZone: 'UTC' })}</td>
-                  <td>{CATEGORIES[e.category]}</td>
-                  <td>{fmt(e.amount)}</td>
-                  <td>{e.description || '—'}</td>
-                  <td style={{ display: 'flex', gap: 6 }}>
-                    <button className="small" onClick={() => setEditForm({ id: e.id, category: e.category, amount: e.amount, description: e.description || '', expense_date: e.expense_date.slice(0, 10) })}>Edit</button>
-                    <button className="danger" onClick={() => handleDelete(e.id)}>Delete</button>
-                  </td>
-                </tr>
+                <React.Fragment key={e.id}>
+                  <tr>
+                    <td>{new Date(e.expense_date).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric', timeZone: 'UTC' })}</td>
+                    <td>{CATEGORIES[e.category]}</td>
+                    <td>{fmt(e.amount)}</td>
+                    <td>{e.description || '—'}</td>
+                    <td style={{ display: 'flex', gap: 6 }}>
+                      <button className="small" onClick={() => setEditForm({ id: e.id, category: e.category, amount: e.amount, description: e.description || '', expense_date: e.expense_date.slice(0, 10) })}>Edit</button>
+                      <button className="danger" onClick={() => handleDelete(e.id)}>Delete</button>
+                    </td>
+                  </tr>
+                  {editForm && editForm.id === e.id && (
+                    <tr>
+                      <td colSpan={5} style={{ background: '#fafafa', padding: '8px 24px' }}>
+                        <form onSubmit={handleEdit} style={{ display: 'flex', gap: 12, alignItems: 'flex-end', flexWrap: 'wrap' }}>
+                          <label>Category
+                            <select value={editForm.category} onChange={(ev) => setEditForm({ ...editForm, category: ev.target.value })}>
+                              {Object.entries(CATEGORIES).map(([k, v]) => <option key={k} value={k}>{v}</option>)}
+                            </select>
+                          </label>
+                          <label>Amount
+                            <input type="number" step="0.01" value={editForm.amount}
+                              onChange={(ev) => setEditForm({ ...editForm, amount: ev.target.value })}
+                              required />
+                          </label>
+                          <label>Date
+                            <input type="date" value={editForm.expense_date}
+                              onChange={(ev) => setEditForm({ ...editForm, expense_date: ev.target.value })}
+                              required />
+                          </label>
+                          <label>Description
+                            <input type="text" value={editForm.description}
+                              onChange={(ev) => setEditForm({ ...editForm, description: ev.target.value })} />
+                          </label>
+                          <button type="submit" className="primary">Save</button>
+                          <button type="button" className="danger" onClick={() => setEditForm(null)}>Cancel</button>
+                        </form>
+                      </td>
+                    </tr>
+                  )}
+                </React.Fragment>
               ))}
             </tbody>
           </table>
         )}
       </div>
-      {editForm && (
-        <div className="card">
-          <h2>Edit Expense</h2>
-          <form onSubmit={handleEdit}>
-            <label>Category
-              <select value={editForm.category} onChange={(e) => setEditForm({ ...editForm, category: e.target.value })}>
-                {Object.entries(CATEGORIES).map(([k, v]) => <option key={k} value={k}>{v}</option>)}
-              </select>
-            </label>
-            <label>Amount
-              <input type="number" step="0.01" value={editForm.amount}
-                onChange={(e) => setEditForm({ ...editForm, amount: e.target.value })}
-                required />
-            </label>
-            <label>Date
-              <input type="date" value={editForm.expense_date}
-                onChange={(e) => setEditForm({ ...editForm, expense_date: e.target.value })}
-                required />
-            </label>
-            <label>Description
-              <input type="text" value={editForm.description}
-                onChange={(e) => setEditForm({ ...editForm, description: e.target.value })} />
-            </label>
-            <button type="submit" className="primary">Save</button>
-            <button type="button" className="danger" onClick={() => setEditForm(null)}>Cancel</button>
-          </form>
-        </div>
-      )}
     </div>
   );
 }

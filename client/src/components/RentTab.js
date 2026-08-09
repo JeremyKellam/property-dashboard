@@ -140,6 +140,21 @@ export default function RentTab() {
                         <button className="danger" onClick={() => handleDelete(r.id)}>Delete</button>
                       </td>
                     </tr>
+                    {editForm && editForm.id === r.id && (
+                      <tr>
+                        <td colSpan={8} style={{ background: '#fafafa', padding: '8px 24px' }}>
+                          <form onSubmit={handleEditRent} style={{ display: 'flex', gap: 12, alignItems: 'flex-end', flexWrap: 'wrap' }}>
+                            <label>Amount Due
+                              <input type="number" step="0.01" value={editForm.amount_due}
+                                onChange={(e) => setEditForm({ ...editForm, amount_due: e.target.value })}
+                                required />
+                            </label>
+                            <button type="submit" className="primary">Save</button>
+                            <button type="button" className="danger" onClick={() => setEditForm(null)}>Cancel</button>
+                          </form>
+                        </td>
+                      </tr>
+                    )}
                     {payments[r.id] && (
                       <tr>
                         <td colSpan={8} style={{ background: '#fafafa', padding: '8px 24px' }}>
@@ -176,20 +191,6 @@ export default function RentTab() {
         )}
       </div>
 
-      {editForm && (
-        <div className="card">
-          <h2>Edit Rent — Unit {editForm.unit_number}</h2>
-          <form onSubmit={handleEditRent}>
-            <label>Amount Due
-              <input type="number" step="0.01" value={editForm.amount_due}
-                onChange={(e) => setEditForm({ ...editForm, amount_due: e.target.value })}
-                required />
-            </label>
-            <button type="submit" className="primary">Save</button>
-            <button type="button" className="danger" onClick={() => setEditForm(null)}>Cancel</button>
-          </form>
-        </div>
-      )}
 
       {payForm.id && (
         <div className="card">

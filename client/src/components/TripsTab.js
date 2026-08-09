@@ -114,44 +114,47 @@ export default function TripsTab() {
             </thead>
             <tbody>
               {trips.map((t) => (
-                <tr key={t.id}>
-                  <td>{new Date(t.trip_date).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric', timeZone: 'UTC' })}</td>
-                  <td>{parseFloat(t.miles).toFixed(1)}</td>
-                  <td>{fmt(parseFloat(t.miles) * IRS_RATE)}</td>
-                  <td>{t.purpose || '—'}</td>
-                  <td style={{ display: 'flex', gap: 6 }}>
-                    <button className="small" onClick={() => setEditForm({ id: t.id, trip_date: t.trip_date.slice(0, 10), miles: t.miles, purpose: t.purpose || '' })}>Edit</button>
-                    <button className="danger" onClick={() => handleDelete(t.id)}>Delete</button>
-                  </td>
-                </tr>
+                <React.Fragment key={t.id}>
+                  <tr>
+                    <td>{new Date(t.trip_date).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric', timeZone: 'UTC' })}</td>
+                    <td>{parseFloat(t.miles).toFixed(1)}</td>
+                    <td>{fmt(parseFloat(t.miles) * IRS_RATE)}</td>
+                    <td>{t.purpose || '—'}</td>
+                    <td style={{ display: 'flex', gap: 6 }}>
+                      <button className="small" onClick={() => setEditForm({ id: t.id, trip_date: t.trip_date.slice(0, 10), miles: t.miles, purpose: t.purpose || '' })}>Edit</button>
+                      <button className="danger" onClick={() => handleDelete(t.id)}>Delete</button>
+                    </td>
+                  </tr>
+                  {editForm && editForm.id === t.id && (
+                    <tr>
+                      <td colSpan={5} style={{ background: '#fafafa', padding: '8px 24px' }}>
+                        <form onSubmit={handleEdit} style={{ display: 'flex', gap: 12, alignItems: 'flex-end', flexWrap: 'wrap' }}>
+                          <label>Date
+                            <input type="date" value={editForm.trip_date}
+                              onChange={(e) => setEditForm({ ...editForm, trip_date: e.target.value })}
+                              required />
+                          </label>
+                          <label>Miles
+                            <input type="number" step="0.1" value={editForm.miles}
+                              onChange={(e) => setEditForm({ ...editForm, miles: e.target.value })}
+                              required />
+                          </label>
+                          <label>Purpose
+                            <input type="text" value={editForm.purpose}
+                              onChange={(e) => setEditForm({ ...editForm, purpose: e.target.value })} />
+                          </label>
+                          <button type="submit" className="primary">Save</button>
+                          <button type="button" className="danger" onClick={() => setEditForm(null)}>Cancel</button>
+                        </form>
+                      </td>
+                    </tr>
+                  )}
+                </React.Fragment>
               ))}
             </tbody>
           </table>
         )}
       </div>
-      {editForm && (
-        <div className="card">
-          <h2>Edit Trip</h2>
-          <form onSubmit={handleEdit}>
-            <label>Date
-              <input type="date" value={editForm.trip_date}
-                onChange={(e) => setEditForm({ ...editForm, trip_date: e.target.value })}
-                required />
-            </label>
-            <label>Miles
-              <input type="number" step="0.1" value={editForm.miles}
-                onChange={(e) => setEditForm({ ...editForm, miles: e.target.value })}
-                required />
-            </label>
-            <label>Purpose
-              <input type="text" value={editForm.purpose}
-                onChange={(e) => setEditForm({ ...editForm, purpose: e.target.value })} />
-            </label>
-            <button type="submit" className="primary">Save</button>
-            <button type="button" className="danger" onClick={() => setEditForm(null)}>Cancel</button>
-          </form>
-        </div>
-      )}
     </div>
   );
 }
