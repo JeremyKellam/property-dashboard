@@ -159,6 +159,9 @@ export default function RentTab() {
                         )}
                       </div>
                     )}
+                    {tenant.notes && (
+                      <div style={{ fontSize: 12, color: '#888', marginTop: 4, whiteSpace: 'pre-line' }}>{tenant.notes}</div>
+                    )}
                     <button className="small" style={{ marginTop: 8 }} onClick={() => setEditingTenant({
                       unit_number: unit,
                       tenant_name: tenant.tenant_name || '',
@@ -167,6 +170,7 @@ export default function RentTab() {
                       lease_start: tenant.lease_start ? tenant.lease_start.slice(0, 10) : '',
                       lease_end: tenant.lease_end ? tenant.lease_end.slice(0, 10) : '',
                       monthly_rent: tenant.monthly_rent || '',
+                      notes: tenant.notes || '',
                     })}>Edit</button>
                   </div>
                 ) : (
@@ -174,7 +178,7 @@ export default function RentTab() {
                     <div style={{ color: '#999', fontSize: 13 }}>No tenant info</div>
                     <button className="small" style={{ marginTop: 8 }} onClick={() => setEditingTenant({
                       unit_number: unit, tenant_name: '', phone: '', email: '',
-                      lease_start: '', lease_end: '', monthly_rent: '',
+                      lease_start: '', lease_end: '', monthly_rent: '', notes: '',
                     })}>Add Tenant</button>
                   </div>
                 )}
@@ -215,6 +219,12 @@ export default function RentTab() {
             <label>Lease End
               <input type="date" value={editingTenant.lease_end}
                 onChange={(e) => setEditingTenant({ ...editingTenant, lease_end: e.target.value })} />
+            </label>
+            <label>Notes
+              <textarea value={editingTenant.notes}
+                onChange={(e) => setEditingTenant({ ...editingTenant, notes: e.target.value })}
+                rows={3} style={{ width: '100%', padding: '8px 10px', border: '1px solid #ddd', borderRadius: 6, fontSize: 14, fontFamily: 'inherit' }}
+                placeholder="Security deposit, car, mailbox, etc." />
             </label>
             <button type="submit" className="primary">Save</button>
             <button type="button" className="danger" onClick={() => setEditingTenant(null)}>Cancel</button>

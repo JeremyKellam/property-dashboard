@@ -43,10 +43,13 @@ const initDb = async () => {
       lease_start DATE,
       lease_end DATE,
       monthly_rent NUMERIC(10,2),
+      notes TEXT,
       created_at TIMESTAMP DEFAULT NOW(),
       updated_at TIMESTAMP DEFAULT NOW()
     )
   `);
+  // Add notes column if table already existed without it
+  await db.query(`ALTER TABLE tenants ADD COLUMN IF NOT EXISTS notes TEXT`).catch(() => {});
 };
 
 const PORT = process.env.PORT || 4000;
