@@ -51,6 +51,7 @@ const initDb = async () => {
   // Add columns if tables already existed without them
   await db.query(`ALTER TABLE tenants ADD COLUMN IF NOT EXISTS notes TEXT`).catch(() => {});
   await db.query(`ALTER TABLE rent_payments ADD COLUMN IF NOT EXISTS tenant_name VARCHAR(255)`).catch(() => {});
+  await db.query(`ALTER TABLE expenses ADD COLUMN IF NOT EXISTS receipt_path TEXT`).catch(() => {});
   // Backfill tenant names on existing rent records that don't have one
   await db.query(`
     UPDATE rent_payments rp SET tenant_name = t.tenant_name

@@ -28,9 +28,18 @@ export const getPayments = (id) => API.get(`/rent/${id}/payments`);
 export const deleteRent = (id) => API.delete(`/rent/${id}`);
 
 export const getExpenses = (params) => API.get('/expenses', { params });
-export const addExpense = (data) => API.post('/expenses', data);
-export const updateExpense = (id, data) => API.put(`/expenses/${id}`, data);
+export const addExpense = (data) => {
+  const fd = new FormData();
+  Object.entries(data).forEach(([k, v]) => { if (v != null) fd.append(k, v); });
+  return API.post('/expenses', fd);
+};
+export const updateExpense = (id, data) => {
+  const fd = new FormData();
+  Object.entries(data).forEach(([k, v]) => { if (v != null) fd.append(k, v); });
+  return API.put(`/expenses/${id}`, fd);
+};
 export const deleteExpense = (id) => API.delete(`/expenses/${id}`);
+export const getReceiptUrl = (id) => API.get(`/expenses/${id}/receipt`);
 
 export const getTrips = (params) => API.get('/trips', { params });
 export const getTripSummary = (params) => API.get('/trips/summary', { params });
