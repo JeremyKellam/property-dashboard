@@ -130,7 +130,7 @@ export default function ExpensesTab() {
 
       <div className="card">
         <h2>All Expenses — {year}</h2>
-        <div style={{ display: 'flex', gap: 12, alignItems: 'flex-end', flexWrap: 'wrap', marginBottom: 16 }}>
+        <form onSubmit={(e) => e.preventDefault()} style={{ marginBottom: 16 }}>
           <label>Category
             <select value={filterCategory} onChange={(e) => setFilterCategory(e.target.value)}>
               <option value="">All</option>
@@ -144,9 +144,9 @@ export default function ExpensesTab() {
             <input type="date" value={filterDateTo} onChange={(e) => setFilterDateTo(e.target.value)} />
           </label>
           {(filterCategory || filterDateFrom || filterDateTo) && (
-            <button className="small" onClick={() => { setFilterCategory(''); setFilterDateFrom(''); setFilterDateTo(''); }}>Clear</button>
+            <button className="small" type="button" onClick={() => { setFilterCategory(''); setFilterDateFrom(''); setFilterDateTo(''); }}>Clear</button>
           )}
-        </div>
+        </form>
         {filtered.length === 0 ? (
           <p style={{ color: '#999', fontSize: 14 }}>No expenses logged.</p>
         ) : (
