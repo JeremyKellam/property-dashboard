@@ -26,6 +26,9 @@ export default function ExpensesTab() {
     expense_date: '',
   });
   const [editForm, setEditForm] = useState(null);
+  const [filterCategory, setFilterCategory] = useState('');
+  const [filterDateFrom, setFilterDateFrom] = useState('');
+  const [filterDateTo, setFilterDateTo] = useState('');
 
   const load = () => getExpenses({ year }).then((r) => setExpenses(r.data));
 
@@ -64,7 +67,15 @@ export default function ExpensesTab() {
   const years = [];
   for (let y = now.getFullYear(); y >= 2020; y--) years.push(y);
 
-  const totals = expenses.reduce((acc, e) => {
+  const filtered = expenses.filter((e) => {
+    if (filterCategory && e.category !== filterCategory) return false;
+    const d = e.expense_date.slice(0, 10);
+    if (filterDateFrom && d < filterDateFrom) return false;
+    if (filterDateTo && d > filterDateTo) return false;
+    return true;
+  });
+
+  const totals = filtered.reduce((acc, e) => {
     acc[e.category] = (acc[e.category] || 0) + parseFloat(e.amount);
     return acc;
   }, {});
@@ -119,7 +130,24 @@ export default function ExpensesTab() {
 
       <div className="card">
         <h2>All Expenses — {year}</h2>
-        {expenses.length === 0 ? (
+        <div style={{ display: 'flex', gap: 12, alignItems: 'flex-end', flexWrap: 'wrap', marginBottom: 16 }}>
+          <label>Category
+            <select value={filterCategory} onChange={(e) => setFilterCategory(e.target.value)}>
+              <option value="">All</option>
+              {Object.entries(CATEGORIES).map(([k, v]) => <option key={k} value={k}>{v}</option>)}
+            </select>
+          </label>
+          <label>From
+            <input type="date" value={filterDateFrom} onChange={(e) => setFilterDateFrom(e.target.value)} />
+          </label>
+          <label>To
+            <input type="date" value={filterDateTo} onChange={(e) => setFilterDateTo(e.target.value)} />
+          </label>
+          {(filterCategory || filterDateFrom || filterDateTo) && (
+            <button className="small" onClick={() => { setFilterCategory(''); setFilterDateFrom(''); setFilterDateTo(''); }}>Clear</button>
+          )}
+        </div>
+        {filtered.length === 0 ? (
           <p style={{ color: '#999', fontSize: 14 }}>No expenses logged.</p>
         ) : (
           <table>
@@ -133,7 +161,7 @@ export default function ExpensesTab() {
               </tr>
             </thead>
             <tbody>
-              {expenses.map((e) => (
+              {filtered.map((e) => (
                 <React.Fragment key={e.id}>
                   <tr>
                     <td>{new Date(e.expense_date).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric', timeZone: 'UTC' })}</td>
