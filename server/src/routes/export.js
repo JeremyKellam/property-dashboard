@@ -40,7 +40,7 @@ router.get('/', async (req, res) => {
   const params = yearFilter ? [yearFilter] : [];
 
   const [rent, expenses, trips] = await Promise.all([
-    pool.query(`SELECT unit_number, year, month, amount_due, amount_paid, status, tenant_name FROM rent_payments ${rentWhere} ORDER BY year, month, unit_number`, params),
+    pool.query(`SELECT unit_number, year, month, amount_due, amount_paid, status FROM rent_payments ${rentWhere} ORDER BY year, month, unit_number`, params),
     pool.query(`SELECT expense_date, category, description, amount FROM expenses ${expenseWhere} ORDER BY expense_date`, params),
     pool.query(`SELECT trip_date, miles, purpose FROM trips ${tripWhere} ORDER BY trip_date`, params),
   ]);
@@ -116,7 +116,6 @@ router.get('/', async (req, res) => {
   const rentSheet = workbook.addWorksheet('Rent');
   rentSheet.columns = [
     { header: 'Unit',        key: 'unit_number',  width: 8  },
-    { header: 'Tenant',      key: 'tenant_name',  width: 24 },
     { header: 'Year',        key: 'year',          width: 8  },
     { header: 'Month',       key: 'month',         width: 8  },
     { header: 'Amount Due',  key: 'amount_due',    width: 14 },
