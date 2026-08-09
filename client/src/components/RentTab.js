@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { getRent, createRent, payRent, applyLateFee, deleteRent, updateRent, getTenants, saveTenant } from '../api';
+import { getRent, createRent, payRent, deleteRent, updateRent, getTenants, saveTenant } from '../api';
 
 const MONTHS = ['January','February','March','April','May','June',
   'July','August','September','October','November','December'];
@@ -34,11 +34,6 @@ export default function RentTab() {
     await payRent(payForm.id, { amount: payForm.amount, payment_date: payForm.payment_date, notes: payForm.notes });
     load();
     setPayForm({ id: null, amount: '', payment_date: '', notes: '' });
-  };
-
-  const handleLateFee = async (id) => {
-    await applyLateFee(id);
-    load();
   };
 
   const handleEditRent = async (e) => {
@@ -83,7 +78,7 @@ export default function RentTab() {
     const month = now.getMonth() + 1;
     const record = records.find((r) => r.unit_number === unit && r.month === month);
     if (!record || record.status === 'paid') return;
-    const balance = parseFloat(record.amount_due) + parseFloat(record.late_fee) - parseFloat(record.amount_paid);
+    const balance = parseFloat(record.amount_due) - parseFloat(record.amount_paid);
     const today = `${year}-${String(month).padStart(2, '0')}-01`;
     await payRent(record.id, { amount: balance, payment_date: today, notes: '' });
     load();
@@ -255,7 +250,6 @@ export default function RentTab() {
                 <th>Month</th>
                 <th>Unit</th>
                 <th>Due</th>
-                <th>Late Fee</th>
                 <th>Paid</th>
                 <th>Balance</th>
                 <th>Status</th>
@@ -264,15 +258,13 @@ export default function RentTab() {
             </thead>
             <tbody>
               {records.map((r) => {
-                const totalOwed = parseFloat(r.amount_due) + parseFloat(r.late_fee);
-                const balance = totalOwed - parseFloat(r.amount_paid);
+                const balance = parseFloat(r.amount_due) - parseFloat(r.amount_paid);
                 return (
                   <React.Fragment key={r.id}>
                     <tr>
                       <td>{MONTHS[r.month - 1]}</td>
                       <td>Unit {r.unit_number}{r.tenant_name ? ` — ${r.tenant_name}` : ''}</td>
                       <td>{fmt(r.amount_due)}</td>
-                      <td>{parseFloat(r.late_fee) > 0 ? fmt(r.late_fee) : '—'}</td>
                       <td>{fmt(r.amount_paid)}</td>
                       <td>{fmt(balance)}</td>
                       <td><span className={`badge ${r.status}`}>{r.status}</span></td>
@@ -280,16 +272,13 @@ export default function RentTab() {
                         <button className="small" onClick={() => setPayForm({ id: r.id, amount: '', payment_date: '', notes: '' })}>
                           Pay
                         </button>
-                        {parseFloat(r.late_fee) === 0 && r.status !== 'paid' && (
-                          <button className="danger" onClick={() => handleLateFee(r.id)}>+Late</button>
-                        )}
                         <button className="small" onClick={() => setEditForm({ id: r.id, unit_number: r.unit_number, amount_due: r.amount_due })}>Edit</button>
                         <button className="danger" onClick={() => handleDelete(r.id)}>Delete</button>
                       </td>
                     </tr>
                     {editForm && editForm.id === r.id && (
                       <tr>
-                        <td colSpan={8} style={{ background: '#fafafa', padding: '8px 24px' }}>
+                        <td colSpan={7} style={{ background: '#fafafa', padding: '8px 24px' }}>
                           <form onSubmit={handleEditRent} style={{ display: 'flex', gap: 12, alignItems: 'flex-end', flexWrap: 'wrap' }}>
                             <label>Amount Due
                               <input type="number" step="0.01" value={editForm.amount_due}
@@ -304,7 +293,7 @@ export default function RentTab() {
                     )}
                     {payForm.id === r.id && (
                       <tr>
-                        <td colSpan={8} style={{ background: '#fafafa', padding: '8px 24px' }}>
+                        <td colSpan={7} style={{ background: '#fafafa', padding: '8px 24px' }}>
                           <form onSubmit={handlePay} style={{ display: 'flex', gap: 12, alignItems: 'flex-end', flexWrap: 'wrap' }}>
                             <label>Amount
                               <input type="number" step="0.01" value={payForm.amount}

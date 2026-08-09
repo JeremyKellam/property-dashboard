@@ -63,8 +63,8 @@ router.post('/:id/pay', async (req, res) => {
   const totalPaid = parseFloat(totals.rows[0].total_paid) || 0;
 
   const rent = await pool.query('SELECT * FROM rent_payments WHERE id = $1', [rentId]);
-  const { amount_due, late_fee } = rent.rows[0];
-  const total_owed = parseFloat(amount_due) + parseFloat(late_fee);
+  const { amount_due } = rent.rows[0];
+  const total_owed = parseFloat(amount_due);
 
   let status = 'unpaid';
   if (totalPaid >= total_owed) status = 'paid';
@@ -93,15 +93,6 @@ router.delete('/:id', async (req, res) => {
   await pool.query('DELETE FROM payments WHERE rent_payment_id = $1', [id]);
   await pool.query('DELETE FROM rent_payments WHERE id = $1', [id]);
   res.json({ success: true });
-});
-
-// Apply late fee to a rent record
-router.post('/:id/late-fee', async (req, res) => {
-  const result = await pool.query(
-    'UPDATE rent_payments SET late_fee = 100, updated_at = NOW() WHERE id = $1 RETURNING *',
-    [req.params.id]
-  );
-  res.json(result.rows[0]);
 });
 
 module.exports = router;
