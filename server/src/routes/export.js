@@ -12,6 +12,7 @@ const CATEGORY_LABELS = {
   maintenance:           'Repairs & Maintenance',
   supplies:              'Supplies',
   professional_fees:     'Legal & Professional Fees',
+  depreciation:          'Depreciation',
 };
 
 // Schedule E line mapping for summary sheet
@@ -24,6 +25,7 @@ const SCHEDULE_E_LINES = [
   { label: 'Repairs & Maintenance',      key: 'maintenance',         line: 'Line 14' },
   { label: 'Supplies',                   key: 'supplies',            line: 'Line 15' },
   { label: 'Legal & Professional Fees',  key: 'professional_fees',   line: 'Line 10' },
+  { label: 'Depreciation',              key: 'depreciation',         line: 'Line 18' },
 ];
 
 const IRS_RATE = 0.70;
@@ -38,7 +40,7 @@ router.get('/', async (req, res) => {
   const params = yearFilter ? [yearFilter] : [];
 
   const [rent, expenses, trips] = await Promise.all([
-    pool.query(`SELECT unit_number, year, month, amount_due, late_fee, amount_paid, status FROM rent_payments ${rentWhere} ORDER BY year, month, unit_number`, params),
+    pool.query(`SELECT unit_number, year, month, amount_due, amount_paid, status, tenant_name FROM rent_payments ${rentWhere} ORDER BY year, month, unit_number`, params),
     pool.query(`SELECT expense_date, category, description, amount FROM expenses ${expenseWhere} ORDER BY expense_date`, params),
     pool.query(`SELECT trip_date, miles, purpose FROM trips ${tripWhere} ORDER BY trip_date`, params),
   ]);
@@ -108,16 +110,16 @@ router.get('/', async (req, res) => {
   summarySheet.addRow({});
   addSummaryTotal('Total Expenses', totalExpenses);
   summarySheet.addRow({});
-  addSummaryTotal('Net Income (before depreciation)', totalRentCollected - totalExpenses);
+  addSummaryTotal('Net Income', totalRentCollected - totalExpenses);
 
   // --- Rent sheet ---
   const rentSheet = workbook.addWorksheet('Rent');
   rentSheet.columns = [
     { header: 'Unit',        key: 'unit_number',  width: 8  },
+    { header: 'Tenant',      key: 'tenant_name',  width: 24 },
     { header: 'Year',        key: 'year',          width: 8  },
     { header: 'Month',       key: 'month',         width: 8  },
     { header: 'Amount Due',  key: 'amount_due',    width: 14 },
-    { header: 'Late Fee',    key: 'late_fee',      width: 12 },
     { header: 'Amount Paid', key: 'amount_paid',   width: 14 },
     { header: 'Status',      key: 'status',        width: 12 },
   ];
