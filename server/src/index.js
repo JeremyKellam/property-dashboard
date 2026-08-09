@@ -57,6 +57,11 @@ const initDb = async () => {
     FROM tenants t
     WHERE rp.unit_number = t.unit_number AND rp.tenant_name IS NULL
   `).catch(() => {});
+  // Fix Unit 1 historical records: Larry Bryla through July 2026
+  await db.query(`
+    UPDATE rent_payments SET tenant_name = 'Larry Bryla'
+    WHERE unit_number = 1 AND (year < 2026 OR (year = 2026 AND month <= 7))
+  `).catch(() => {});
 };
 
 const PORT = process.env.PORT || 4000;
