@@ -41,6 +41,11 @@ export const deleteTrip = (id) => API.delete(`/trips/${id}`);
 
 export const updateRent = (id, data) => API.put(`/rent/${id}`, data);
 
+export const getTenants = () => API.get('/tenants');
+export const saveTenant = (data) => API.post('/tenants', data);
+export const updateTenant = (id, data) => API.put(`/tenants/${id}`, data);
+export const deleteTenant = (id) => API.delete(`/tenants/${id}`);
+
 export const getMonthlySummary = (params) => API.get('/summary/monthly', { params });
 
 export const exportToExcel = async (year) => {

@@ -25,11 +25,34 @@ app.use((req, res, next) => {
   next();
 });
 
+app.use('/api/tenants', require('./routes/tenants'));
 app.use('/api/rent', require('./routes/rent'));
 app.use('/api/expenses', require('./routes/expenses'));
 app.use('/api/trips', require('./routes/trips'));
 app.use('/api/summary', require('./routes/summary'));
 app.use('/api/export', require('./routes/export'));
 
+const initDb = async () => {
+  await db.query(`
+    CREATE TABLE IF NOT EXISTS tenants (
+      id SERIAL PRIMARY KEY,
+      unit_number INTEGER UNIQUE NOT NULL CHECK (unit_number BETWEEN 1 AND 4),
+      tenant_name VARCHAR(255),
+      phone VARCHAR(50),
+      email VARCHAR(255),
+      lease_start DATE,
+      lease_end DATE,
+      monthly_rent NUMERIC(10,2),
+      created_at TIMESTAMP DEFAULT NOW(),
+      updated_at TIMESTAMP DEFAULT NOW()
+    )
+  `);
+};
+
 const PORT = process.env.PORT || 4000;
-app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
+initDb().then(() => {
+  app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
+}).catch((err) => {
+  console.error('DB init failed:', err);
+  process.exit(1);
+});
