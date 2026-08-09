@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { getRent, createRent, payRent, applyLateFee, getPayments, deleteRent, updateRent, getTenants, saveTenant } from '../api';
+import { getRent, createRent, payRent, applyLateFee, deleteRent, updateRent, getTenants, saveTenant } from '../api';
 
 const MONTHS = ['January','February','March','April','May','June',
   'July','August','September','October','November','December'];
@@ -13,7 +13,6 @@ export default function RentTab() {
   const [setupForm, setSetupForm] = useState({ unit_number: 1, amount_due: '', month: now.getMonth() + 1 });
   const [payForm, setPayForm] = useState({ id: null, amount: '', payment_date: '', notes: '' });
   const [editForm, setEditForm] = useState(null);
-  const [payments, setPayments] = useState({});
   const [tenants, setTenants] = useState([]);
   const [editingTenant, setEditingTenant] = useState(null);
 
@@ -53,15 +52,6 @@ export default function RentTab() {
     if (!window.confirm('Delete this rent record and all its payments?')) return;
     await deleteRent(id);
     load();
-  };
-
-  const loadPayments = async (id) => {
-    if (payments[id]) {
-      setPayments((p) => { const n = { ...p }; delete n[id]; return n; });
-    } else {
-      const r = await getPayments(id);
-      setPayments((p) => ({ ...p, [id]: r.data }));
-    }
   };
 
   const handleSaveTenant = async (e) => {
@@ -294,9 +284,6 @@ export default function RentTab() {
                         {parseFloat(r.late_fee) === 0 && r.status !== 'paid' && (
                           <button className="danger" onClick={() => handleLateFee(r.id)}>+Late</button>
                         )}
-                        <button className="small" onClick={() => loadPayments(r.id)}>
-                          {payments[r.id] ? 'Hide' : 'History'}
-                        </button>
                         <button className="small" onClick={() => setEditForm({ id: r.id, unit_number: r.unit_number, amount_due: r.amount_due })}>Edit</button>
                         <button className="danger" onClick={() => handleDelete(r.id)}>Delete</button>
                       </td>
@@ -316,31 +303,28 @@ export default function RentTab() {
                         </td>
                       </tr>
                     )}
-                    {payments[r.id] && (
+                    {payForm.id === r.id && (
                       <tr>
                         <td colSpan={8} style={{ background: '#fafafa', padding: '8px 24px' }}>
-                          {payments[r.id].length === 0 ? (
-                            <span style={{ color: '#999', fontSize: 13 }}>No payments recorded.</span>
-                          ) : (
-                            <table>
-                              <thead>
-                                <tr>
-                                  <th>Date</th>
-                                  <th>Amount</th>
-                                  <th>Notes</th>
-                                </tr>
-                              </thead>
-                              <tbody>
-                                {payments[r.id].map((p) => (
-                                  <tr key={p.id}>
-                                    <td>{new Date(p.payment_date).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric', timeZone: 'UTC' })}</td>
-                                    <td>{fmt(p.amount)}</td>
-                                    <td>{p.notes || '—'}</td>
-                                  </tr>
-                                ))}
-                              </tbody>
-                            </table>
-                          )}
+                          <form onSubmit={handlePay} style={{ display: 'flex', gap: 12, alignItems: 'flex-end', flexWrap: 'wrap' }}>
+                            <label>Amount
+                              <input type="number" step="0.01" value={payForm.amount}
+                                onChange={(e) => setPayForm({ ...payForm, amount: e.target.value })}
+                                placeholder="0.00" required />
+                            </label>
+                            <label>Date
+                              <input type="date" value={payForm.payment_date}
+                                onChange={(e) => setPayForm({ ...payForm, payment_date: e.target.value })}
+                                required />
+                            </label>
+                            <label>Notes
+                              <input type="text" value={payForm.notes}
+                                onChange={(e) => setPayForm({ ...payForm, notes: e.target.value })}
+                                placeholder="e.g. Venmo" />
+                            </label>
+                            <button type="submit" className="primary">Save</button>
+                            <button type="button" className="danger" onClick={() => setPayForm({ id: null, amount: '', payment_date: '', notes: '' })}>Cancel</button>
+                          </form>
                         </td>
                       </tr>
                     )}
@@ -352,32 +336,6 @@ export default function RentTab() {
         )}
       </div>
 
-      {payForm.id && (
-        <div className="card">
-          <h2>Record Payment — Unit {records.find((r) => r.id === payForm.id)?.unit_number}</h2>
-          <form onSubmit={handlePay}>
-            <label>Amount
-              <input type="number" step="0.01" value={payForm.amount}
-                onChange={(e) => setPayForm({ ...payForm, amount: e.target.value })}
-                placeholder="0.00" required />
-            </label>
-            <label>Date
-              <input type="date" value={payForm.payment_date}
-                onChange={(e) => setPayForm({ ...payForm, payment_date: e.target.value })}
-                required />
-            </label>
-            <label>Notes
-              <input type="text" value={payForm.notes}
-                onChange={(e) => setPayForm({ ...payForm, notes: e.target.value })}
-                placeholder="e.g. Venmo" />
-            </label>
-            <button type="submit" className="primary">Save</button>
-            <button type="button" className="danger" onClick={() => setPayForm({ id: null, amount: '', payment_date: '', notes: '' })}>
-              Cancel
-            </button>
-          </form>
-        </div>
-      )}
     </div>
   );
 }
