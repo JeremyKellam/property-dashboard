@@ -77,12 +77,17 @@ router.post('/:id/pay', async (req, res) => {
   res.json(updated.rows[0]);
 });
 
-// Update amount due on a rent record
+// Update a rent record
 router.put('/:id', async (req, res) => {
-  const { amount_due } = req.body;
+  const { amount_due, amount_paid } = req.body;
+  const paid = parseFloat(amount_paid) || 0;
+  const due = parseFloat(amount_due) || 0;
+  let status = 'unpaid';
+  if (paid >= due) status = 'paid';
+  else if (paid > 0) status = 'partial';
   const result = await pool.query(
-    'UPDATE rent_payments SET amount_due=$1, updated_at=NOW() WHERE id=$2 RETURNING *',
-    [amount_due, req.params.id]
+    'UPDATE rent_payments SET amount_due=$1, amount_paid=$2, status=$3, updated_at=NOW() WHERE id=$4 RETURNING *',
+    [due, paid, status, req.params.id]
   );
   res.json(result.rows[0]);
 });

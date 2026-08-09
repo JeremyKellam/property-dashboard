@@ -38,7 +38,7 @@ export default function RentTab() {
 
   const handleEditRent = async (e) => {
     e.preventDefault();
-    await updateRent(editForm.id, { amount_due: editForm.amount_due });
+    await updateRent(editForm.id, { amount_due: editForm.amount_due, amount_paid: editForm.amount_paid });
     load();
     setEditForm(null);
   };
@@ -272,7 +272,7 @@ export default function RentTab() {
                         <button className="small" onClick={() => setPayForm({ id: r.id, amount: '', payment_date: '', notes: '' })}>
                           Pay
                         </button>
-                        <button className="small" onClick={() => setEditForm({ id: r.id, unit_number: r.unit_number, amount_due: r.amount_due })}>Edit</button>
+                        <button className="small" onClick={() => setEditForm({ id: r.id, unit_number: r.unit_number, amount_due: r.amount_due, amount_paid: r.amount_paid })}>Edit</button>
                         <button className="danger" onClick={() => handleDelete(r.id)}>Delete</button>
                       </td>
                     </tr>
@@ -283,6 +283,11 @@ export default function RentTab() {
                             <label>Amount Due
                               <input type="number" step="0.01" value={editForm.amount_due}
                                 onChange={(e) => setEditForm({ ...editForm, amount_due: e.target.value })}
+                                required />
+                            </label>
+                            <label>Amount Paid
+                              <input type="number" step="0.01" value={editForm.amount_paid}
+                                onChange={(e) => setEditForm({ ...editForm, amount_paid: e.target.value })}
                                 required />
                             </label>
                             <button type="submit" className="primary">Save</button>
