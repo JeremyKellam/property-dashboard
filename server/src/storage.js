@@ -1,14 +1,17 @@
 const { createClient } = require('@supabase/supabase-js');
 
-const supabase = createClient(
-  process.env.SUPABASE_URL,
-  process.env.SUPABASE_SERVICE_KEY
-);
-
 const BUCKET = 'receipts';
 
+let supabase;
+function getClient() {
+  if (!supabase) {
+    supabase = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_SERVICE_KEY);
+  }
+  return supabase;
+}
+
 async function uploadReceipt(fileName, fileBuffer, contentType) {
-  const { data, error } = await supabase.storage
+  const { data, error } = await getClient().storage
     .from(BUCKET)
     .upload(fileName, fileBuffer, { contentType, upsert: true });
   if (error) throw error;
@@ -16,7 +19,7 @@ async function uploadReceipt(fileName, fileBuffer, contentType) {
 }
 
 async function getReceiptUrl(filePath) {
-  const { data, error } = await supabase.storage
+  const { data, error } = await getClient().storage
     .from(BUCKET)
     .createSignedUrl(filePath, 3600);
   if (error) throw error;
@@ -24,7 +27,7 @@ async function getReceiptUrl(filePath) {
 }
 
 async function deleteReceipt(filePath) {
-  const { error } = await supabase.storage
+  const { error } = await getClient().storage
     .from(BUCKET)
     .remove([filePath]);
   if (error) throw error;
