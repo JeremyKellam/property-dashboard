@@ -31,13 +31,16 @@ router.get('/:id/payments', async (req, res) => {
 // Create or update a rent record for a unit/month
 router.post('/', async (req, res) => {
   const { unit_number, year, month, amount_due } = req.body;
+  // Snapshot tenant name at time of creation
+  const tenant = await pool.query('SELECT tenant_name FROM tenants WHERE unit_number = $1', [unit_number]);
+  const tenantName = tenant.rows[0]?.tenant_name || null;
   const result = await pool.query(
-    `INSERT INTO rent_payments (unit_number, year, month, amount_due)
-     VALUES ($1, $2, $3, $4)
+    `INSERT INTO rent_payments (unit_number, year, month, amount_due, tenant_name)
+     VALUES ($1, $2, $3, $4, $5)
      ON CONFLICT (unit_number, year, month)
      DO UPDATE SET amount_due = $4, updated_at = NOW()
      RETURNING *`,
-    [unit_number, year, month, amount_due]
+    [unit_number, year, month, amount_due, tenantName]
   );
   res.json(result.rows[0]);
 });

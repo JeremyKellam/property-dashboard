@@ -266,12 +266,11 @@ export default function RentTab() {
               {records.map((r) => {
                 const totalOwed = parseFloat(r.amount_due) + parseFloat(r.late_fee);
                 const balance = totalOwed - parseFloat(r.amount_paid);
-                const tenant = tenants.find((t) => t.unit_number === r.unit_number);
                 return (
                   <React.Fragment key={r.id}>
                     <tr>
                       <td>{MONTHS[r.month - 1]}</td>
-                      <td>Unit {r.unit_number}{tenant?.tenant_name ? ` — ${tenant.tenant_name}` : ''}</td>
+                      <td>Unit {r.unit_number}{r.tenant_name ? ` — ${r.tenant_name}` : ''}</td>
                       <td>{fmt(r.amount_due)}</td>
                       <td>{parseFloat(r.late_fee) > 0 ? fmt(r.late_fee) : '—'}</td>
                       <td>{fmt(r.amount_paid)}</td>
