@@ -10,4 +10,4 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Ping Supabase
-        run: psql "${{ secrets.DATABASE_URL }}" -c "SELECT 1"
+        run: psql "$(echo "${{ secrets.DATABASE_URL }}" | sed 's/[?&]pgbouncer=true//')" -c "SELECT 1"
