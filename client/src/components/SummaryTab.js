@@ -4,7 +4,7 @@ import { BarChart, Bar, XAxis, YAxis, Tooltip, Legend, ResponsiveContainer } fro
 
 const MONTHS = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
 
-const fmt = (n) => `$${parseFloat(n || 0).toLocaleString('en-US', { minimumFractionDigits: 2 })}`;
+const fmt = (n) => parseFloat(n || 0).toLocaleString('en-US', { style: 'currency', currency: 'USD' });
 
 export default function SummaryTab() {
   const [year, setYear] = useState(new Date().getFullYear());
@@ -32,6 +32,7 @@ export default function SummaryTab() {
   const totalIncome = chartData.reduce((s, r) => s + r.Income, 0);
   const totalExpenses = chartData.reduce((s, r) => s + r.Expenses, 0);
   const netIncome = totalIncome - totalExpenses;
+  const activeMonths = chartData.filter((r) => r.Income > 0 || r.Expenses > 0).length || 1;
 
   const years = [];
   for (let y = new Date().getFullYear(); y >= 2020; y--) years.push(y);
@@ -60,7 +61,7 @@ export default function SummaryTab() {
         </div>
         <div className="stat">
           <label>Avg Monthly Net</label>
-          <div className={`value ${netIncome >= 0 ? 'positive' : 'negative'}`}>{fmt(netIncome / 12)}</div>
+          <div className={`value ${netIncome >= 0 ? 'positive' : 'negative'}`}>{fmt(netIncome / activeMonths)}</div>
         </div>
       </div>
 
