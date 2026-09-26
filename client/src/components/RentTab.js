@@ -6,7 +6,7 @@ const MONTHS = ['January','February','March','April','May','June',
 
 const fmt = (n) => `$${parseFloat(n || 0).toLocaleString('en-US', { minimumFractionDigits: 2 })}`;
 
-export default function RentTab() {
+export default function RentTab({ availableYears = [] }) {
   const now = new Date();
   const [year, setYear] = useState(now.getFullYear());
   const [records, setRecords] = useState([]);
@@ -21,6 +21,12 @@ export default function RentTab() {
 
   useEffect(() => { load(); }, [year]); // eslint-disable-line react-hooks/exhaustive-deps
   useEffect(() => { loadTenants(); }, []);
+
+  useEffect(() => {
+    if (availableYears.length > 0 && !availableYears.includes(year)) {
+      setYear(availableYears[0]);
+    }
+  }, [availableYears]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const handleSetup = async (e) => {
     e.preventDefault();
@@ -84,9 +90,6 @@ export default function RentTab() {
     load();
   };
 
-  const years = [];
-  for (let y = now.getFullYear(); y >= 2020; y--) years.push(y);
-
   const currentMonth = now.getMonth() + 1;
 
   return (
@@ -94,7 +97,9 @@ export default function RentTab() {
       <div className="year-selector">
         <label>Year</label>
         <select value={year} onChange={(e) => setYear(parseInt(e.target.value))}>
-          {years.map((y) => <option key={y} value={y}>{y}</option>)}
+          {(availableYears.length > 0 ? availableYears : [now.getFullYear()]).map((y) => (
+            <option key={y} value={y}>{y}</option>
+          ))}
         </select>
       </div>
 

@@ -15,7 +15,7 @@ const CATEGORIES = {
 
 const fmt = (n) => `$${parseFloat(n || 0).toLocaleString('en-US', { minimumFractionDigits: 2 })}`;
 
-export default function ExpensesTab() {
+export default function ExpensesTab({ availableYears = [] }) {
   const now = new Date();
   const [year, setYear] = useState(now.getFullYear());
   const [expenses, setExpenses] = useState([]);
@@ -35,6 +35,12 @@ export default function ExpensesTab() {
   const load = () => getExpenses({ year }).then((r) => setExpenses(r.data));
 
   useEffect(() => { load(); }, [year]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  useEffect(() => {
+    if (availableYears.length > 0 && !availableYears.includes(year)) {
+      setYear(availableYears[0]);
+    }
+  }, [availableYears]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -76,9 +82,6 @@ export default function ExpensesTab() {
     window.open(res.data.url, '_blank');
   };
 
-  const years = [];
-  for (let y = now.getFullYear(); y >= 2020; y--) years.push(y);
-
   const filtered = expenses.filter((e) => {
     if (filterCategory && e.category !== filterCategory) return false;
     const d = e.expense_date.slice(0, 10);
@@ -97,7 +100,9 @@ export default function ExpensesTab() {
       <div className="year-selector">
         <label>Year</label>
         <select value={year} onChange={(e) => setYear(parseInt(e.target.value))}>
-          {years.map((y) => <option key={y} value={y}>{y}</option>)}
+          {(availableYears.length > 0 ? availableYears : [now.getFullYear()]).map((y) => (
+            <option key={y} value={y}>{y}</option>
+          ))}
         </select>
       </div>
 

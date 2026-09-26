@@ -56,6 +56,8 @@ export const deleteTenant = (id) => API.delete(`/tenants/${id}`);
 
 export const getMonthlySummary = (params) => API.get('/summary/monthly', { params });
 
+export const getYears = () => API.get('/years');
+
 export const exportToExcel = async (year) => {
   const params = year ? { year } : {};
   const res = await API.get('/export', { params, responseType: 'blob' });
