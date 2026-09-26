@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
+  <!-- Background -->
+  <rect width="100" height="100" rx="18" fill="#1e40af"/>
+  <!-- Roof -->
+  <polygon points="50,12 88,46 12,46" fill="white"/>
+  <!-- Building body -->
+  <rect x="18" y="45" width="64" height="42" fill="white"/>
+  <!-- 4 windows (2x2 grid suggesting quadplex) -->
+  <rect x="24" y="52" width="16" height="12" rx="2" fill="#1e40af"/>
+  <rect x="60" y="52" width="16" height="12" rx="2" fill="#1e40af"/>
+  <rect x="24" y="68" width="16" height="12" rx="2" fill="#1e40af"/>
+  <rect x="60" y="68" width="16" height="12" rx="2" fill="#1e40af"/>
+  <!-- Door -->
+  <rect x="42" y="62" width="16" height="25" rx="2" fill="#1e40af"/>
+</svg>
