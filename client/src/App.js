@@ -68,7 +68,7 @@ function App() {
                 onClick={e => e.stopPropagation()}>
                 <h3 style={{ margin: '0 0 16px', fontSize: 16, color: '#111' }}>Export Year</h3>
                 {availableYears.map(y => (
-                  <button key={y} style={{ display: 'block', width: '100%', marginBottom: 8, fontSize: 15 }}
+                  <button key={y} style={{ display: 'block', width: '100%', marginBottom: 8, fontSize: 15, color: '#111', background: '#f5f5f5', border: '1px solid #ddd' }}
                     onClick={() => { exportToExcel(y); setShowExportMenu(false); }}>
                     {y}
                   </button>
